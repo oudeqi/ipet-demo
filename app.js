@@ -5,6 +5,11 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+// 引入 mongoose 配置文件
+var mongoose = require('./config/mongoose.js');
+// 执行配置文件中的函数，以实现数据库的配置和 Model 的创建等
+mongoose();
+
 var index = require('./routes/index');
 var users = require('./routes/users');
 

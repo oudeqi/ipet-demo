@@ -1,7 +1,10 @@
-var express = require('express');
-var router = express.Router();
-var User = require('../models/user.js');
-var svgCaptcha = require('svg-captcha');
+let express = require('express');
+let router = express.Router();
+let svgCaptcha = require('svg-captcha');
+let crypto = require('crypto');
+let User = require('../models/user.js');
+let { trim } = require('lodash')
+let { isPhone, isPassword } = require('../config/utils')
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -17,9 +20,64 @@ router.get('/captcha', function(req, res, next) {
 	res.status(200).send(captcha.data);
 });
 
-/* 注册页面 */ 
+/* 展示注册页面 */
 router.get('/reg', function(req, res, next) {
   res.render('users-reg', { title: 'users-reg' });
+});
+
+/* 注册用户 */
+router.post('/reg', function(req, res, next) {
+  let phone = trim(req.body.phone)
+  let password = req.body.password
+  if (!isPhone(phone)) {
+    res.json({
+      status: 'error',
+      msg: '手机号码格式不正确',
+      data: req.body
+    });
+    return;
+  }
+  if (!isPassword(password)) {
+    res.json({
+      status: 'error',
+      msg: '密码格式不正确',
+      data: req.body
+    });
+    return;
+  }
+  User.findOne({phone: phone}, function(err, doc){
+    if(err) {
+      throw err;
+    }
+    if (doc) {
+      res.json({
+        status: 'error',
+        msg: '该手机号码已被注册',
+        data: null
+      });
+    } else {
+      let salt = '' + Math.random()
+      let passKey = '' + Math.random()
+      let shasum = crypto.createHmac('sha256', passKey)
+      let user = new User({
+        password: shasum.update(password + salt).digest('hex'),
+        phone,
+        salt,
+        passKey
+      })
+      user.save(function(err, doc) {
+        if (err) {
+          throw err;
+        } else {
+          res.json({
+            status: 'ok',
+            msg: '注册成功',
+            data: doc
+          });
+        }
+      });
+    }
+  });
 });
 
 /* 删除所有用户 */ 

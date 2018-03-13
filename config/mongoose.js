@@ -12,7 +12,7 @@ module.exports = function () {
 	  */
 	mongoose.connection.on('connected', function () {    
 	    console.log('Mongoose connection open to ' + DB_URL);  
-	});    
+	});
 
 	/**
 	 * 连接异常
@@ -26,6 +26,7 @@ module.exports = function () {
 	 */
 	mongoose.connection.on('disconnected', function () {    
 	    console.log('Mongoose connection disconnected');  
-	});   
+	});
+
 	return mongoose;
 };

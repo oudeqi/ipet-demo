@@ -6,9 +6,36 @@ let User = require('../models/user.js');
 let { trim } = require('lodash')
 let { isPhone, isPassword } = require('../config/utils')
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+router.post('/login', function(req, res, next) {
+  let phone = trim(req.body.phone)
+  let password = req.body.password
+  User.findOne({phone, phone}, function(err, doc){
+    if(err) {
+      throw err;
+    }
+    console.log(doc)
+    if (doc) {
+      console.log('yes')
+      let shasum = crypto.createHmac('sha256', doc.passKey);
+      let pass = shasum.update(password + doc.salt).digest('hex');
+      if (pass === doc.password) {
+        res.json({
+          status: 'ok',
+          msg: '登录成功',
+          data: doc
+        });
+      } else {
+        res.json({
+          status: 'error',
+          msg: '登录用户名或者密码不正确',
+          data: null
+        });
+      }
+    } else {
+      console.log('no')
+    }
+  })
+
 });
 
 /* 获取图片验证码 */ 
@@ -22,6 +49,8 @@ router.get('/captcha', function(req, res, next) {
 
 /* 展示注册页面 */
 router.get('/reg', function(req, res, next) {
+  console.log(req.cookies)
+  console.log(req.signedCookies)
   res.render('users-reg', { title: 'users-reg' });
 });
 

@@ -1,28 +1,29 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var session = require('express-session');
-var bodyParser = require('body-parser');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
+const bodyParser = require('body-parser');
+const { COOKIE_SECRET, COOKIE_NAME, COOKIE_MAXAGE } = require('./config/index');
 
 // 引入 mongoose 配置文件
-var mongoose = require('./config/mongoose.js');
+const mongoose_config = require('./config/mongoose.js');
 // 执行配置文件中的函数，以实现数据库的配置和 Model 的创建等
-mongoose();
+const mongoose = mongoose_config();
 
-var index = require('./routes/index');
-var users = require('./routes/users');
-
-var app = express();
+const index = require('./routes/index');
+const users = require('./routes/users');
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+// app.set('view engine', 'ejs');
 //--------------------------------------------
-//app.set( 'view engine', 'html' );
-//再用app.engine()方法注册模板引擎的后缀名。代码：
-//app.engine('.html', require('ejs').__express);//两个下划线
+//注册模板引擎的后缀名
+app.engine('html', require('ejs').__express);
+app.set('view engine', 'html');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -31,12 +32,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
-    secret: '12345',
-    name: 'testapp',   //这里的name值得是cookie的name，默认cookie的name是：connect.sid
-    cookie: {maxAge: 80000 },  //设置maxAge是80000ms，即80s后session和相应的cookie失效过期
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    secret: COOKIE_SECRET,
+    name: COOKIE_NAME,   //这里的name值得是cookie的name，默认cookie的name是：connect.sid
+    cookie: {maxAge: COOKIE_MAXAGE},  //设置maxAge是80000ms，即80s后session和相应的cookie失效过期
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: true
 }));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);

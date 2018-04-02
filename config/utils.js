@@ -1,14 +1,12 @@
 module.exports = {
   isUrl (value) {
-    // return /^(ht){1}(tp|tps):\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?/.test(value)
-    return value
+    return /^(ht){1}(tp|tps):\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?/.test(value)
   },
   isPhone (value) {
-    return true
+    return /^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/.test(value)
   },
   isEmail (value) {
     return /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(value)
-    // return value
   },
   isPassword (value) {
     return /[0-9A-Za-z_]{6,18}$/.test(value)

@@ -1,21 +1,31 @@
-var express = require('express');
-var router = express.Router();
-
-var User = require('../models/user.js');
+const express = require('express');
+const router = express.Router();
+const svgCaptcha = require('svg-captcha');
+const User = require('../models/user.js');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-	res.render('index', { title: 'Express' });
+	if (req.session.user) {
+		res.render('index', { session: req.session });
+	} else {
+		res.redirect(302, '/users/login');
+	}
+});
+
+/* 获取图片验证码 */ 
+router.get('/captcha', function(req, res, next) {
+	let captcha = svgCaptcha.createMathExpr();
+	req.session.captcha = captcha.text;
+	res.type('svg'); // 使用ejs等模板时如果报错 res.type('html')
+	res.status(200).send(captcha.data);
 });
 
 /* test */ 
 router.get('/test', function(req, res, next){
-
 	var user = new User({
 		uid: 3,
 		username: 'Sid'
 	});
-
 	user.save(function(err){
 		if(err){
 			res.end('Error');

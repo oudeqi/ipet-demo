@@ -1,63 +1,78 @@
-let express = require('express');
-let router = express.Router();
-let svgCaptcha = require('svg-captcha');
-let crypto = require('crypto');
-let User = require('../models/user.js');
-let { trim } = require('lodash')
-let { isPhone, isPassword } = require('../config/utils')
+const express = require('express');
+const router = express.Router();
+const crypto = require('crypto');
+const User = require('../models/user.js');
+const { trim } = require('lodash')
+const { isPhone, isPassword } = require('../config/utils')
 
+/* 用户登录 */
+router.get('/login', function(req, res, next) {
+  res.render('users/login', {session: req.session});
+});
 router.post('/login', function(req, res, next) {
-  let phone = trim(req.body.phone)
+  let username = trim(req.body.username)
   let password = req.body.password
-  User.findOne({phone, phone}, function(err, doc){
+  let captcha = req.body.captcha
+  if (!captcha || captcha !== req.session.captcha) {
+    res.json({
+      status: 'error',
+      msg: '验证码不正确',
+      data: null
+    });
+    return;
+  }
+  var cond = {
+    $or: [
+      {phone: username},
+      {email: username}
+    ]
+  };
+  User.find(cond, function(err, docs){
     if(err) {
       throw err;
     }
-    console.log(doc)
-    if (doc) {
-      console.log('yes')
+    console.log(docs)
+    let users = docs.filter((doc) => {
       let shasum = crypto.createHmac('sha256', doc.passKey);
       let pass = shasum.update(password + doc.salt).digest('hex');
-      if (pass === doc.password) {
-        res.json({
-          status: 'ok',
-          msg: '登录成功',
-          data: doc
-        });
-      } else {
-        res.json({
-          status: 'error',
-          msg: '登录用户名或者密码不正确',
-          data: null
-        });
-      }
+      return pass === doc.password
+    })
+    if (users.length > 0) {
+      console.log(users[0])
+      users[0].lastLogin = new Date()
+      users[0].save()
+      req.session.user = users[0]
+      res.json({
+        status: 'ok',
+        msg: '登录成功',
+        data: users[0] // TODO
+      });
     } else {
-      console.log('no')
+      res.json({
+        status: 'error',
+        msg: '登录用户名或者密码不正确',
+        data: null
+      });
     }
   })
-
-});
-
-/* 获取图片验证码 */ 
-router.get('/captcha', function(req, res, next) {
-	var captcha = svgCaptcha.createMathExpr();
-	console.log(captcha.text)
-	// req.session.captcha = captcha.text;
-	res.type('svg'); // 使用ejs等模板时如果报错 res.type('html')
-	res.status(200).send(captcha.data);
-});
-
-/* 展示注册页面 */
-router.get('/reg', function(req, res, next) {
-  console.log(req.cookies)
-  console.log(req.signedCookies)
-  res.render('users-reg', { title: 'users-reg' });
 });
 
 /* 注册用户 */
+router.get('/reg', function(req, res, next) {
+  res.render('users/reg', {session: req.session});
+});
 router.post('/reg', function(req, res, next) {
   let phone = trim(req.body.phone)
   let password = req.body.password
+  let captcha = req.body.captcha
+  if (!captcha || captcha !== req.session.captcha) {
+    res.json({
+      status: 'error',
+      msg: '验证码不正确',
+      data: req.body
+    });
+    return;
+  }
   if (!isPhone(phone)) {
     res.json({
       status: 'error',

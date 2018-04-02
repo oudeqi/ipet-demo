@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title><%= title %></title>
+	<title>登录</title>
 	<link rel='stylesheet' href='/stylesheets/style.css' />
 	<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	<style>
@@ -14,12 +14,13 @@
 	-->
 </head>
 <body>
+	<pre><%= JSON.stringify(session) %></pre>
 	<div class="container">
 		<form>
 			<div class="form-group row">
-				<label for="phone" class="col-sm-4 col-form-label">电话号码</label>
+				<label for="phone" class="col-sm-4 col-form-label">手机号码</label>
 				<div class="col-sm-4">
-					<input type="text" class="form-control" id="phone" placeholder="输入手机号码" value="">
+					<input type="text" class="form-control" id="username" placeholder="手机号 / Email" value="">
 				</div>
 			</div>
 			<div class="form-group row">
@@ -35,30 +36,8 @@
 				</div>
 				<div class="col-sm-4">
 					<a href="javascript:void(0);">
-						<img src="/users/captcha" id="codePic">
+						<img src="/captcha" id="codePic">
 					</a>
-				</div>
-			</div>
-			<div class="form-group row">
-				<label class="col-sm-4 col-form-label"></label>
-				<div class="col-sm-4">
-					<button type="button" id="reg" class="btn btn-primary">注册</button>
-				</div>
-			</div>
-		</form>
-	</div>
-	<div class="container">
-		<form>
-			<div class="form-group row">
-				<label for="phone" class="col-sm-4 col-form-label">手机号码</label>
-				<div class="col-sm-4">
-					<input type="text" class="form-control" id="phone-login" placeholder="输入手机号码" value="">
-				</div>
-			</div>
-			<div class="form-group row">
-				<label for="pwd" class="col-sm-4 col-form-label">密码</label>
-				<div class="col-sm-4">
-					<input type="password" class="form-control" id="pwd-login" placeholder="设置登录密码">
 				</div>
 			</div>
 			<div class="form-group row">
@@ -75,37 +54,34 @@
 		var oldSrc = $(this).attr('src')
 		$(this).attr('src', oldSrc.split('?')[0] + '?' + new Date().getTime());
 	})
-	$('#reg').bind('click', function (e) {
-		e.preventDefault()
-		$.post('/users/reg', {
-			phone: $('#phone').val().trim(),
-			password: $('#pwd').val().trim()
-		}).done(function (res) {
-			console.log(res)
-			if (res.status === 'ok') {
-				alert(res.msg)
-			} else {
-				alert('注册失败')
-			}
-		}).fail(function (err) {
-			console.log(err)
-		})
-	})
-
 	$('#login').click(function(e){
 		e.preventDefault()
+		if (!$('#username').val().trim()) {
+			alert('请输入手机号！')
+			return false;
+		}
+		if (!$('#pwd').val().trim()) {
+			alert('请输入密码！')
+			return false;
+		}
+		if (!$('#code').val().trim()) {
+			alert('请输入验证码！')
+			return false;
+		}
 		$.post('/users/login', {
-			phone: $('#phone-login').val().trim(),
-			password: $('#pwd-login').val().trim()
+			username: $('#username').val().trim(),
+			password: $('#pwd').val().trim(),
+			captcha: $('#code').val().trim()
 		}).done(function (res) {
 			console.log(res)
 			if (res.status === 'ok') {
 				alert(res.msg)
+				location.href = '../'
 			} else {
-				alert('登录失败')
+				alert(res.msg)
 			}
 		}).fail(function (err) {
-			console.log(err)
+			alert('网络连接异常，请重试！')
 		})
 	})
 </script>

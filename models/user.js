@@ -8,11 +8,10 @@ const UserSchema = new mongoose.Schema({
     required: true
   },
   createTime: {
-    type: Number,
-    required: true,
-    default: new Date().getTime()
+    type: Date,
+    default: new Date()
   },
-  lastLogin: Number,
+  lastLogin: Date,
   salt: String,
   passKey: String
 }, {

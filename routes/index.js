@@ -46,7 +46,7 @@ const renameUploadFile = function (fileName){
 }
 
 /* 上传图片 */ 
-const upload = multer({
+const multerOpts = {
 	storage: multer.diskStorage({  
 		destination: function (req, file, cb) {
 			let folderName = path.join(__dirname, '..', 'uploads');
@@ -59,36 +59,42 @@ const upload = multer({
 	}),
 	fileFilter: function (req, file, cb) {
 		if (!file.mimetype.includes('image')) {
-			// 拒绝这个文件，并返回错误
 	  		cb(new Error('只能上传图片'))
-			// 拒绝这个文件，使用`false`
-	  		// cb(null, false)
-		} else if (file.size > (1024 * 1024 * 10)) {
-			cb(new Error('图片太大'))
 		} else {
-			// 接受这个文件，使用`true`
 			cb(null, true)
 		}
+		// 拒绝文件，但是不报错
+		// cb(null, false)
 	},
 	limits: {
-		fileSize: 1024 * 1024 * 10
+		fileSize: 1024 * 1024 * 10 //超过10M报错
 	}
 	// preservePath
-})  
-router.post('/upload', upload.single('avatar'), function(req, res, next) {
-    let file = req.file;
-	res.json({
-		status: 'ok',
-		msg: '文件上传成功',
-		data: {
-			fieldname: file.fieldname,
-			originalname: file.originalname,
-			encoding: file.encoding,
-			mimetype: file.mimetype,
-			filename: file.filename,
-			size: file.size
+}
+const upload = multer(multerOpts).single('avatar')
+router.post('/upload', function(req, res, next) {
+	upload(req, res, function (err) {
+		if (err) {
+			res.json({
+				status: 'error',
+				msg: err.message
+			});
+		} else {
+			let file = {
+				fieldname: req.file.fieldname,
+				originalname: req.file.originalname,
+				encoding: req.file.encoding,
+				mimetype: req.file.mimetype,
+				filename: req.file.filename,
+				size: req.file.size
+			};
+		    res.json({
+				status: 'ok',
+				msg: '文件上传成功',
+				data: file
+			});
 		}
-	});
+	})
 });
 
 /* test */ 

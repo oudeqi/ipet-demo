@@ -31,17 +31,16 @@ router.post('/login', function(req, res, next) {
     if(err) {
       throw err;
     }
-    console.log(docs)
     let users = docs.filter((doc) => {
       let shasum = crypto.createHmac('sha256', doc.passKey);
       let pass = shasum.update(password + doc.salt).digest('hex');
       return pass === doc.password
     })
     if (users.length > 0) {
-      console.log(users[0])
       users[0].lastLogin = new Date()
       users[0].save()
       req.session.user = users[0]
+      res.locals = {message:'登陆成功'};
       res.json({
         status: 'ok',
         msg: '登录成功',

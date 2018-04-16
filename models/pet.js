@@ -17,7 +17,7 @@ const PetSchema = new mongoose.Schema({
     required: true
   },
   birthday: {
-	type: Date,
+    type: Date,
     default: new Date()
   }
 }, {

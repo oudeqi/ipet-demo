@@ -15,6 +15,18 @@ router.get('/', function(req, res, next) {
 	}
 });
 
+router.post('/test/fetch/:id', function(req, res, next) {
+	res.json({
+		ok: true,
+		body: 'i am body',
+		sent: {
+			params:req.params,
+			query: req.query,
+			body:req.body
+		}
+	});
+});
+
 /* 获取图片验证码 */ 
 router.get('/captcha', function(req, res, next) {
 	let captcha = svgCaptcha.createMathExpr();
@@ -80,19 +92,27 @@ router.post('/upload', function(req, res, next) {
 				msg: err.message
 			});
 		} else {
-			let file = {
-				fieldname: req.file.fieldname,
-				originalname: req.file.originalname,
-				encoding: req.file.encoding,
-				mimetype: req.file.mimetype,
-				filename: req.file.filename,
-				size: req.file.size
-			};
-		    res.json({
-				status: 'ok',
-				msg: '文件上传成功',
-				data: file
-			});
+			if (req.file) {
+				let file = {
+					fieldname: req.file.fieldname,
+					originalname: req.file.originalname,
+					encoding: req.file.encoding,
+					mimetype: req.file.mimetype,
+					filename: req.file.filename,
+					size: req.file.size
+				};
+			    res.json({
+					status: 'ok',
+					msg: '文件上传成功',
+					data: file
+				});
+			} else {
+				res.json({
+					status: 'error',
+					msg: '没有上传任何图片',
+					data: null
+				});
+			}
 		}
 	})
 });

@@ -14,7 +14,10 @@ const mongoose_config = require('./config/mongoose.js');
 const mongoose = mongoose_config();
 
 const index = require('./routes/index');
+const pet = require('./routes/pet');
 const users = require('./routes/users');
+const other = require('./routes/other');
+const test = require('./routes/test');
 const app = express();
 
 // view engine setup
@@ -55,7 +58,10 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 // });
 
 app.use('/', index);
+app.use('/', other);
+app.use('/pet', pet);
 app.use('/users', users);
+app.use('/test', test);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

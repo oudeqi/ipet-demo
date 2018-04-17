@@ -6,17 +6,32 @@
 		<link rel='stylesheet' href='/stylesheets/style.css' />
 		<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 		<link href="/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.css" rel="stylesheet" media="screen">
+		<link href="/vendor/toastr/toastr.css" rel="stylesheet" media="screen">
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+		<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
+		<!-- airbnb -->
+		<style type="text/css">
+		.toast-middle-center {
+			top: 50%;
+		    right: 50%;
+		    transform: translate(50%, -50%);
+		}
+		.height40 {
+			height: 40px;
+		}
+		</style>
 	</head>
 	<body>
 		<h1 style="text-align: center;">首页</h1>
-		<pre><%= JSON.stringify(session) %></pre>
+		<div style="overflow: scroll;">
+			<%= JSON.stringify(session) %>
+		</div>
 		<p>
 			<% if(locals.message){ %>
 				<span><%= locals.message %></span>
 			<% } %>
 		</p>
-		<form>
+		<form id="myform">
 			<div class="form-group">
 				<label for="file">选择头像</label>
 				<input type="file" name="avatar" class="form-control-file" id="file">
@@ -27,7 +42,7 @@
 			</div>
 			<div class="form-group">
 				<label for="name">名字</label>
-				<input type="email" class="form-control" id="name" aria-describedby="emailHelp" placeholder="请输入名字">
+				<input type="text" class="form-control" id="name" name="name" placeholder="请输入名字">
 				<small class="form-text text-muted">填写之后不能更改</small>
 			</div>
 			<div class="form-group">
@@ -51,10 +66,10 @@
 			</div>
 			<div class="form-group">
 				<label for="birthday">生日</label>
-				<input type="email" class="form-control" id="birthday" aria-describedby="emailHelp" placeholder="请输入生日">
+				<input type="date" data-allow-input="true" class="form-control height40" id="birthday" name="birthday" placeholder="请输入生日">
 				<small class="form-text text-muted">填写之后不能更改</small>
 			</div>
-			<button type="button" class="btn btn-primary">添加</button>
+			<button type="button" class="btn btn-primary" id="petAdd">添加</button>
 		</form>
 	</body>
 	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
@@ -63,17 +78,14 @@
 	<script type="text/javascript" src="/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
 	<script type="text/javascript" src="/javascripts/lib.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	<script src="https://npmcdn.com/flatpickr/dist/l10n/zh.js"></script>
+	<script type="text/javascript" src="/vendor/toastr/toastr.min.js"></script>
 	<script type="text/javascript">
-
+		// datetimepicker
+		// flatpickr
 		$('#birthday').flatpickr({
-	        language:  'zh-CN',
-	        weekStart: 1,
-	        todayBtn:  1,
-			autoclose: 1,
-			todayHighlight: 1,
-			startView: 2,
-			minView: 2,
-			forceParse: 0
+			locale: 'zh',
+			defaultDate: new Date()
 	    });
 
 		fetch('/test/fetch/14?name=nana', {
@@ -129,12 +141,119 @@
 			.then(res => {
 				console.log(res)
 				let pic = document.querySelector('#avatar_view')
-				if (pic) {
+				if (pic && res.status === 'ok') {
 					pic.setAttribute('src', res.data.filename)
 					pic.setAttribute('data-src', res.data.filename)
 				}
 			})
 			.catch(error => console.log(error))
 		}
+
+		function changeSelectOption (el, opts) {
+			let tpl = opts.map(item => {
+				return `<option ${(i => i.selected ? ' selected ' : '')(item)} value="${item.value}">${item.label}</option>`
+			})
+			el.innerHTML = tpl
+		}
+
+		let ww = [
+			{
+				value: 'td',
+				label: '泰迪',
+				selected: true
+			},
+			{
+				value: 'kj',
+				label: '柯基'
+			},
+			{
+				value: 'jm',
+				label: '金毛'
+			},
+			{
+				value: 'tg',
+				label: '中华田园'
+			},
+			{
+				value: 'cc',
+				label: '串串'
+			}
+		]
+
+		let mm = [
+			{
+				value: 'yd',
+				label: '英短',
+				selected: true
+			},
+			{
+				value: 'md',
+				label: '美短'
+			},
+			{
+				value: 'bo',
+				label: '布偶'
+			},
+			{
+				value: 'tm',
+				label: '中华田园'
+			},
+			{
+				value: 'cc',
+				label: '串串'
+			}
+		]
+
+		function changeVarieties (me) {
+			if ($(me).val() ==='ww') {
+				changeSelectOption(document.querySelector('#varieties'), ww)
+			} else if ($(me).val()=== 'mm') {
+				changeSelectOption(document.querySelector('#varieties'), mm)
+			}
+		}
+
+		changeVarieties(document.querySelector('#category'))
+		$('#category').bind('change', function(){
+			changeVarieties(this)
+		})
+
+		toastr.options.timeOut = 1000
+		toastr.options.preventDuplicates = true
+		toastr.options.positionClass = 'toast-middle-center'
+		$('#petAdd').click(function(){
+			let avatar = document.querySelector('#avatar_view').getAttribute('data-src')
+			if (!avatar) {
+				toastr.info('请添加头像')
+				return false
+			}
+			if (!$('#name').val()) {
+				toastr.info('请输入名字')
+				return false
+			}
+			if (!$('#category').val()) {
+				toastr.info('请选择类别')
+				return false
+			}
+			if (!$('#varieties').val()) {
+				toastr.info('请选择品种')
+				return false
+			}
+			if (!$('#birthday').val()) {
+				toastr.info('请填写生日')
+				return false
+			}
+			let fd = new FormData(document.querySelector('#myform'))
+			let date = $('#birthday').val().split('-')
+			fd.set('avatar', document.querySelector('#avatar_view').getAttribute('data-src'))
+			fd.set('birthday', new Date(parseInt(date[0]), parseInt(date[1]) - 1, parseInt(date[2])).getTiem())
+			__.fetch('/pet/add', {
+				method: 'post',
+				body: fd
+			}).then(res => {
+				console.log(res)
+			}).catch(err => {
+				console.log(err)
+			})
+		})
 	</script>
 </html>

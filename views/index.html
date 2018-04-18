@@ -48,19 +48,19 @@
 			<div class="form-group">
 				<label for="category">类别</label>
 				<select class="form-control" id="category" name="category">
-					<option value="ww">汪汪</option>
-					<option value="mm">喵喵</option>
+					<!-- <option value="ww">汪汪</option>
+					<option value="mm">喵喵</option> -->
 				</select>
 				<small class="form-text text-muted">选择之后不能更改</small>
 			</div>
 			<div class="form-group">
 				<label for="varieties">品种</label>
 				<select class="form-control" id="varieties" name="varieties">
-					<option value="td">泰迪</option>
+					<!-- <option value="td">泰迪</option>
 					<option value="kj">柯基</option>
 					<option value="jm">金毛</option>
 					<option value="jm">中华田园</option>
-					<option value="cc">串串</option>
+					<option value="cc">串串</option> -->
 				</select>
 				<small class="form-text text-muted">选择之后不能更改</small>
 			</div>
@@ -81,6 +81,7 @@
 	<script src="https://npmcdn.com/flatpickr/dist/l10n/zh.js"></script>
 	<script type="text/javascript" src="/vendor/toastr/toastr.min.js"></script>
 	<script type="text/javascript">
+
 		// datetimepicker
 		// flatpickr
 		$('#birthday').flatpickr({
@@ -88,45 +89,47 @@
 			defaultDate: new Date()
 	    });
 
-		fetch('/test/fetch/14?name=nana', {
-			method: 'post',
-			// headers: {
-			// 	'Content-Type': 'application/json'
-			// },
-			body: JSON.stringify({
-				age: 100
+	    toastr.options.timeOut = 1000
+		toastr.options.preventDuplicates = true
+		toastr.options.positionClass = 'toast-middle-center'
+
+		function replaceSelectOptions (el, arr, attr) {
+			let tpl = arr.map(item => {
+				return `<option ${item.active?'selected':''} value="${item.value}" ${
+					((i) => {
+						let val = item.variety && item.variety.length > 0 ? encodeURIComponent(JSON.stringify(item.variety)) : '';
+						return (attr || 'data-sub') + '=' + val
+					})(item)
+				}>${item.label}</option>`
 			})
-		}).then(response => {
-			let contentType = response.headers.get('content-type')
-			if (contentType.includes('application/json')) {
-				return response.json().then(json => {
-					if (response.ok) {
-						return json
-					} else {
-						return Promise.reject(Object.assign({}, json, {
-							status: response.status,
-							statusText: response.statusText
-						}))
-					}
-				})
-			} else if (contentType.includes('text/html')) {
-				return response.text().then(text => {
-					if (response.ok) {
-						return json
-					} else {
-						return Promise.reject({
-							status: response.status,
-							statusText: response.statusText,
-							err: text
-						})
-					}
+			el.innerHTML = tpl.join('')
+		}
+
+		function replaceSelectOptionsAccordingToParent (child, parent, attr) {
+			let value = $(parent).val()
+			let $selected = $(parent).find('option[value="'+ value +'"]')
+			let varieties = JSON.parse(decodeURIComponent($selected.attr(attr || 'data-sub')))
+			replaceSelectOptions(child, varieties, attr)
+		}
+
+		__.fetch('/pet/category', {
+			method: 'get'
+		}).then(res => {
+			console.log('then', res)
+			if (res.ok) {
+				let category = res.data
+				replaceSelectOptions($('#category')[0], category)
+				replaceSelectOptionsAccordingToParent($('#varieties')[0], $('#category')[0])
+				$('#category').bind('change', function(){
+					replaceSelectOptionsAccordingToParent($('#varieties')[0], this)
 				})
 			} else {
-				throw new Error(`Sorry, content-type ${contentType} not supported`)
+				toastr.info('获取宠物类别失败')
 			}
+		}).catch(err => {
+			console.log('catch', err)
+			toastr.info('服务器连接异常，请稍后再试')
 		})
-		.then(data => console.log(data))
-		.catch(error => console.log(error))
 
 		var oInput = document.querySelector('#file');
 		oInput.onchange = function upload(){
@@ -148,78 +151,7 @@
 			})
 			.catch(error => console.log(error))
 		}
-
-		function changeSelectOption (el, opts) {
-			let tpl = opts.map(item => {
-				return `<option ${(i => i.selected ? ' selected ' : '')(item)} value="${item.value}">${item.label}</option>`
-			})
-			el.innerHTML = tpl
-		}
-
-		let ww = [
-			{
-				value: 'td',
-				label: '泰迪',
-				selected: true
-			},
-			{
-				value: 'kj',
-				label: '柯基'
-			},
-			{
-				value: 'jm',
-				label: '金毛'
-			},
-			{
-				value: 'tg',
-				label: '中华田园'
-			},
-			{
-				value: 'cc',
-				label: '串串'
-			}
-		]
-
-		let mm = [
-			{
-				value: 'yd',
-				label: '英短',
-				selected: true
-			},
-			{
-				value: 'md',
-				label: '美短'
-			},
-			{
-				value: 'bo',
-				label: '布偶'
-			},
-			{
-				value: 'tm',
-				label: '中华田园'
-			},
-			{
-				value: 'cc',
-				label: '串串'
-			}
-		]
-
-		function changeVarieties (me) {
-			if ($(me).val() ==='ww') {
-				changeSelectOption(document.querySelector('#varieties'), ww)
-			} else if ($(me).val()=== 'mm') {
-				changeSelectOption(document.querySelector('#varieties'), mm)
-			}
-		}
-
-		changeVarieties(document.querySelector('#category'))
-		$('#category').bind('change', function(){
-			changeVarieties(this)
-		})
-
-		toastr.options.timeOut = 1000
-		toastr.options.preventDuplicates = true
-		toastr.options.positionClass = 'toast-middle-center'
+		
 		$('#petAdd').click(function(){
 			let avatar = document.querySelector('#avatar_view').getAttribute('data-src')
 			if (!avatar) {
@@ -243,9 +175,21 @@
 				return false
 			}
 			let fd = new FormData(document.querySelector('#myform'))
+			// 没有name属性的输入框不会加入FormData数据里
 			let date = $('#birthday').val().split('-')
+
+			// 设置了'Content-Type': 'application/x-www-form-urlencoded'的formdata
+			//  数据会被装进body里，否则req.body取不到，数据没有存在请求的body里面
+
+			// 设置了'Content-Type': 'application/x-www-form-urlencoded'的formdata 
+			// 会改变第一个参数的数据结构，不管是文件，还是字符串，
+
+			// 想要获取formdata 提交的数据可以用两种方式，
+			// 添加'Content-Type': 'application/x-www-form-urlencoded'，比较麻烦
+			// 后台使用multer 中间件，提交的数据会被装进body里面
+
 			fd.set('avatar', document.querySelector('#avatar_view').getAttribute('data-src'))
-			fd.set('birthday', new Date(parseInt(date[0]), parseInt(date[1]) - 1, parseInt(date[2])).getTiem())
+			fd.set('birthday', new Date(parseInt(date[0]), parseInt(date[1]) - 1, parseInt(date[2])).getTime())
 			__.fetch('/pet/add', {
 				method: 'post',
 				body: fd

@@ -144,7 +144,7 @@
 			.then(res => {
 				console.log(res)
 				let pic = document.querySelector('#avatar_view')
-				if (pic && res.status === 'ok') {
+				if (pic && res.ok) {
 					pic.setAttribute('src', res.data.filename)
 					pic.setAttribute('data-src', res.data.filename)
 				}

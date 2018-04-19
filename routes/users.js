@@ -5,54 +5,59 @@ const User = require('../models/user.js');
 const { trim } = require('lodash')
 const { isPhone, isPassword } = require('../config/utils')
 
+const random = function () {
+  return String(Math.random()).substring(2)
+}
+const convert = function (value) {
+  return value.substr(0, 10).padEnd(20, 'dyrcjqlgcj')
+}
+const convertPassword = function (password, salt, passKey) {
+  return crypto.createHmac('sha256', passKey).update(password + salt).digest('hex')
+}
+
 /* 用户登录 */
 router.get('/login', function(req, res, next) {
   res.render('users/login', {session: req.session});
 });
+
 router.post('/login', function(req, res, next) {
-  let username = trim(req.body.username)
-  let password = req.body.password
-  let captcha = req.body.captcha
+  let { username, password, captcha } = req.body
+  username = trim(username)
   if (!captcha || captcha !== req.session.captcha) {
-    res.json({
-      status: 'error',
+    return res.json({
+      ok: false,
       msg: '验证码不正确',
       data: null
-    });
-    return;
+    })
   }
-  var cond = {
+  let cond = {
     $or: [
       {phone: username},
       {email: username}
     ]
-  };
+  }
   User.find(cond, function(err, docs){
-    if(err) {
-      throw err;
-    }
+    if(err) return next(err)
     let users = docs.filter((doc) => {
-      let shasum = crypto.createHmac('sha256', doc.passKey);
-      let pass = shasum.update(password + doc.salt).digest('hex');
-      return pass === doc.password
+      return doc.password === convertPassword(password, convert(doc.salt), convert(doc.passKey))
     })
-    if (users.length > 0) {
-      users[0].lastLogin = new Date()
-      users[0].save()
-      req.session.user = users[0]
-      res.locals = {message:'登陆成功'};
-      res.json({
-        status: 'ok',
-        msg: '登录成功',
-        data: users[0] // TODO
-      });
-    } else {
-      res.json({
-        status: 'error',
+    if (users.length === 0) {
+      return res.json({
+        ok: false,
         msg: '登录用户名或者密码不正确',
         data: null
-      });
+      })
     }
+    let currUser = users[0]
+    currUser.lastLogin = new Date()
+    currUser.save()
+    req.session.user = currUser
+    res.locals = {message:'登陆成功'};
+    res.json({
+      ok: true,
+      msg: '登录成功',
+      data: users[0] // TODO
+    })
   })
 });
 
@@ -60,83 +65,56 @@ router.post('/login', function(req, res, next) {
 router.get('/reg', function(req, res, next) {
   res.render('users/reg', {session: req.session});
 });
+
 router.post('/reg', function(req, res, next) {
-  let phone = trim(req.body.phone)
-  let password = req.body.password
-  let captcha = req.body.captcha
+  let {phone, password, captcha} = req.body
   if (!captcha || captcha !== req.session.captcha) {
-    res.json({
-      status: 'error',
+    return res.json({
+      ok: false,
       msg: '验证码不正确',
       data: req.body
-    });
-    return;
+    })
   }
+  let msg = 'success';
   if (!isPhone(phone)) {
-    res.json({
-      status: 'error',
-      msg: '手机号码格式不正确',
-      data: req.body
-    });
-    return;
+    msg = '手机号码格式不正确'
   }
   if (!isPassword(password)) {
-    res.json({
-      status: 'error',
-      msg: '密码格式不正确',
+    msg = '密码格式不正确'
+  }
+  if (msg !== 'success') {
+    return res.json({
+      ok: false,
+      msg: msg,
       data: req.body
     });
-    return;
   }
   User.findOne({phone: phone}, function(err, doc){
-    if(err) {
-      throw err;
-    }
+    if(err) return next(err)
     if (doc) {
-      res.json({
-        status: 'error',
+      return res.json({
+        ok: false,
         msg: '该手机号码已被注册',
         data: null
-      });
-    } else {
-      let salt = '' + Math.random()
-      let passKey = '' + Math.random()
-      let shasum = crypto.createHmac('sha256', passKey)
-      let user = new User({
-        password: shasum.update(password + salt).digest('hex'),
-        phone,
-        salt,
-        passKey
       })
-      user.save(function(err, doc) {
-        if (err) {
-          throw err;
-        } else {
-          res.json({
-            status: 'ok',
-            msg: '注册成功',
-            data: doc
-          });
-        }
-      });
     }
-  });
-});
-
-/* 删除所有用户 */ 
-router.get('/delete', function(req, res, next) {
-	User.find({}, function (err,docs) {
-		if (err) {
-			console.log('find err:', err);
-    		return;
-		}
-		if (docs.length !== 0) {
-			docs.forEach(item => {
-				item.remove();
-			})
-		}
-		res.json(docs);
-	})
-});
+    let salt = random()
+    let passKey = random()
+    let user = new User({
+      password: convertPassword(password, convert(salt), convert(passKey)),
+      phone,
+      salt,
+      passKey
+    })
+    user.save(function(err, doc) {
+      if (err) return next(err);
+      res.json({
+        ok: true,
+        msg: '注册成功',
+        data: doc
+      })
+    })
+  })
+})
 
 module.exports = router;

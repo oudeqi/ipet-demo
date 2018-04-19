@@ -76,11 +76,9 @@
 			captcha: $('#code').val().trim()
 		}).done(function (res) {
 			console.log(res)
-			if (res.status === 'ok') {
-				alert(res.msg)
+			alert(res.msg)
+			if (res.ok) {
 				location.href = './login'
-			} else {
-				alert(res.msg)
 			}
 		}).fail(function (err) {
 			alert('网络连接异常，请重试！')

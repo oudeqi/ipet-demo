@@ -58,3 +58,42 @@ fetch('/test/fetch/14?name=nana', {
  */ 
 
 module.exports = router;
+
+/* 
+1. 对于同步执行的代码，Express 会捕获所有在路由处理函数中的抛出的异常，
+然后将它传给下一个错误处理中间件
+app.get('/', function (req, res) {
+ throw new Error('oh no!')
+})
+app.use(function (err, req, res, next) {
+ console.log(err.message) // 噢！不!
+})
+
+2. 当异步程序在执行时抛出异常的情况，Express 就无能为力。
+原因在于当你的程序开始执行回调函数时，它原来的栈信息已经丢失。
+app.get('/', function (req, res) {
+ queryDb(function (er, data) {
+  if (er) throw er
+ })
+})
+app.use(function (err, req, res, next) {
+ // 这里拿不到错误信息
+})
+
+3. 对于这种情况，可以使用 next 函数来将错误传递给下一个错误处理中间件
+app.get('/', function (req, res, next) {
+ queryDb(function (err, data) {
+  if (err) return next(err)
+  // 处理数据
+ 
+  makeCsv(data, function (err, csv) {
+   if (err) return next(err)
+   // 处理 csv
+ 
+  })
+ })
+})
+app.use(function (err, req, res, next) {
+ // 处理错误
+})
+ */

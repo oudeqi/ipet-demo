@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const PetSchema = new mongoose.Schema({
-  portrait: {
+  avatar: {
   	type: String,
     required: true
   },
@@ -16,10 +16,7 @@ const PetSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  birthday: {
-    type: Date,
-    default: new Date()
-  }
+  birthday: Date
 }, {
   collection : 'pets',
 });

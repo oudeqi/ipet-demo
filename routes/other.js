@@ -67,33 +67,31 @@ router.get('/captcha', function(req, res, next) {
 router.post('/upload', function(req, res, next) {
 	upload(req, res, function (err) {
 		if (err) {
-			res.json({
-				status: 'error',
+			return res.json({
+				ok: false,
 				msg: err.message
 			});
-		} else {
-			if (req.file) {
-				let file = {
-					fieldname: req.file.fieldname,
-					originalname: req.file.originalname,
-					encoding: req.file.encoding,
-					mimetype: req.file.mimetype,
-					filename: req.file.filename,
-					size: req.file.size
-				};
-			    res.json({
-					status: 'ok',
-					msg: '文件上传成功',
-					data: file
-				});
-			} else {
-				res.json({
-					status: 'error',
-					msg: '没有上传任何图片',
-					data: null
-				});
-			}
 		}
+		if (!req.file) {
+			return res.json({
+				ok: false,
+				msg: '没有上传任何图片',
+				data: null
+			})
+		}
+		let file = {
+			fieldname: req.file.fieldname,
+			originalname: req.file.originalname,
+			encoding: req.file.encoding,
+			mimetype: req.file.mimetype,
+			filename: req.file.filename,
+			size: req.file.size
+		};
+	    res.json({
+			ok: true,
+			msg: '文件上传成功',
+			data: file
+		});
 	})
 });
 

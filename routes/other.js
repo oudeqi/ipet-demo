@@ -1,20 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const fs = require('fs');
 const svgCaptcha = require('svg-captcha');
 const multer  = require('multer');  
+const { createFolder } = require('../config/utils')
 
-// 创建文件夹
-const createFolder = function(folder){
-    try{
-    	// 同步判断文件夹是否存在
-        fs.accessSync(folder, fs.constants.F_OK); 
-    }catch(e){
-    	// 同步创建文件夹
-        fs.mkdirSync(folder);
-    }  
-};
 const renameUploadFile = function (fileName){
 	// let prefix = fileName.split('.').reverse().slice(1).reverse().join('.');
 	// let Suffix = fileName.split('.').reverse()[0];

@@ -2,26 +2,10 @@ const express = require('express');
 const router = express.Router();
 const multer  = require('multer');
 const path  = require('path');
+const fs  = require('fs');
 const Pet = require('../models/pet.js');
 const { PET_CATEGORY } = require('../config')
-
-function copySingleFile (src, dist) {
-  let fileReadStream = fs.createReadStream(src)
-  let fileWriteStream = fs.createWriteStream(dist)
-  fileReadStream.pipe(fileWriteStream)
-  fileWriteStream.on('close', function(){  
-    console.log('copy over');    
-  });
-}
-
-const fileExists = function (path) {
-	try {
-		fs.accessSync(path, fs.constants.F_OK)
-		return true
-	} catch (err) {
-		return false
-	}
-}
+const { createFolder, copySingleFile, fileExists } = require('../config/utils')
 
 router.post('/add', multer({ dest: 'uploads/' }).none(), function (req, res, next) {
 	let { avatar, name, category, varieties, birthday } = req.body
@@ -29,12 +13,7 @@ router.post('/add', multer({ dest: 'uploads/' }).none(), function (req, res, nex
 	if (!avatar) {
 		msg = '请上传头像'
 	}
-	// let avatarPath = path.resolve(__dirname, '..', 'uploads', avatar)
-	let avatarPath = path.resolve(__dirname, '..', 'uploads', '_sprites_1524132700026_21971491287884337.png')
-	console.log('avatarPath----------------------------------')
-	console.log(avatarPath)
-	console.log(fileExists(avatarPath))
-	
+	let avatarPath = path.resolve(__dirname, '..', 'uploads', avatar)
 	if (!fileExists(avatarPath)) {
 		msg = '头像不存在，请重新上传'
 	}
@@ -72,9 +51,8 @@ router.post('/add', multer({ dest: 'uploads/' }).none(), function (req, res, nex
 		if (err) {
 			next(err)
 		} else {
-			// console.log('dist-avatarPath--------------------------')
-			// console.log(path.resolve(__dirname, '..', 'public/images', avatar))
-			// copySingleFile(avatarPath, path.resolve(__dirname, '..', 'public/images', avatar))
+			createFolder(path.resolve(__dirname, '..', 'avatar'))
+			copySingleFile(avatarPath, path.resolve(__dirname, '..', 'avatar', avatar))
 			res.json({
 				ok: true,
 				msg: 'success',

@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 module.exports = {
   isUrl (value) {
     return /^(ht){1}(tp|tps):\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?/.test(value)
@@ -32,5 +34,33 @@ module.exports = {
   trim (str) {
     var reExtraSpace = /^\s*(.*?)\s+$/;
     return str.replace(reExtraSpace, '$1')
+  },
+  // 创建文件夹
+  createFolder (folder) {
+    try{
+      // 同步判断文件夹是否存在
+        fs.accessSync(folder, fs.constants.F_OK); 
+    }catch(e){
+      // 同步创建文件夹
+        fs.mkdirSync(folder);
+    }  
+  },
+  // 复制单个文件
+  copySingleFile (src, dist) {
+    let fileReadStream = fs.createReadStream(src)
+    let fileWriteStream = fs.createWriteStream(dist)
+    fileReadStream.pipe(fileWriteStream)
+    fileWriteStream.on('close', function(){  
+      console.log('copy over');    
+    });
+  },
+  // 文件是否存在
+  fileExists (path) {
+    try {
+      fs.accessSync(path, fs.constants.F_OK)
+      return true
+    } catch (err) {
+      return false
+    }
   }
 }

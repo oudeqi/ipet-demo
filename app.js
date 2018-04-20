@@ -46,6 +46,8 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 // 上传图片的文件
 app.use(express.static(path.join(__dirname, 'uploads')));
+// 上传的头像
+app.use(express.static(path.join(__dirname, 'avatar')));
 
 // 允许跨域访问
 // app.all('*', function(req, res, next) {

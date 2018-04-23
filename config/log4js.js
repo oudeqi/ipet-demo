@@ -45,8 +45,8 @@ exports.getLogger = function (name) {
 exports.useLogger = function (app, logger) {
     app.use(log4js.connectLogger(logger || log4js.getLogger('default'), {
         format: '[:remote-addr :method :url :status :response-timems]--[:referrer HTTP/:http-version :user-agent]',
-        // 设置日志内容的格式[express框架对应的url]
+        // 整合express设置日志内容的格式[express框架对应的url]
         level:log4js.levels.INFO
-        // 设置日志的颜色[express框架对应的url]
+        // 整合express设置日志的颜色[express框架对应的url]
     }))
 }

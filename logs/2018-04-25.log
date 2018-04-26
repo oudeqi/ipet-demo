@@ -1,0 +1,45 @@
+[2018-04-25T09:38:48.100] [ERROR] app.js - [/favicon.ico] Not Found
+[2018-04-25T09:39:02.607] [ERROR] app.js - [/stylesheets/style.css] Not Found
+[2018-04-25T09:39:02.753] [ERROR] app.js - [/favicon.ico] Not Found
+[2018-04-25T09:39:54.622] [ERROR] app.js - [/stylesheets/style.css] Not Found
+[2018-04-25T09:40:00.525] [ERROR] app.js - [/stylesheets/style.css] Not Found
+[2018-04-25T09:40:00.621] [ERROR] app.js - [/favicon.ico] Not Found
+[2018-04-25T09:40:02.628] [ERROR] app.js - [/stylesheets/style.css] Not Found
+[2018-04-25T09:40:04.260] [ERROR] app.js - [/stylesheets/style.css] Not Found
+[2018-04-25T09:40:09.005] [ERROR] app.js - [/stylesheets/style.css] Not Found
+[2018-04-25T09:40:11.553] [ERROR] app.js - [/favicon.ico] Not Found
+[2018-04-25T09:40:13.473] [ERROR] app.js - [/stylesheets/style.css] Not Found
+[2018-04-25T09:41:53.712] [ERROR] app.js - [/stylesheets/style.css] Not Found
+[2018-04-25T09:46:51.251] [INFO] routes/index.js/ - routes/index.js info
+[2018-04-25T09:46:51.254] [ERROR] routes/index.js/ - routes/index.js error
+[2018-04-25T09:46:51.299] [ERROR] app.js - [/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.css] Not Found
+[2018-04-25T09:46:51.312] [ERROR] app.js - [/vendor/toastr/toastr.css] Not Found
+[2018-04-25T09:46:51.323] [ERROR] app.js - [/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.js] Not Found
+[2018-04-25T09:46:52.332] [ERROR] app.js - [/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.zh-CN.js] Not Found
+[2018-04-25T09:46:52.336] [ERROR] app.js - [/javascripts/lib.js] Not Found
+[2018-04-25T09:46:52.340] [ERROR] app.js - [/vendor/toastr/toastr.min.js] Not Found
+[2018-04-25T09:46:53.345] [ERROR] app.js - [/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.js] Not Found
+[2018-04-25T09:46:53.365] [ERROR] app.js - [/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.zh-CN.js] Not Found
+[2018-04-25T09:46:53.388] [ERROR] app.js - [/javascripts/lib.js] Not Found
+[2018-04-25T09:46:53.415] [ERROR] app.js - [/vendor/toastr/toastr.min.js] Not Found
+[2018-04-25T09:46:57.968] [INFO] routes/index.js/ - routes/index.js info
+[2018-04-25T09:46:57.971] [ERROR] routes/index.js/ - routes/index.js error
+[2018-04-25T09:46:58.004] [ERROR] app.js - [/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.css] Not Found
+[2018-04-25T09:46:58.015] [ERROR] app.js - [/vendor/toastr/toastr.css] Not Found
+[2018-04-25T09:46:58.029] [ERROR] app.js - [/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.js] Not Found
+[2018-04-25T09:46:58.039] [ERROR] app.js - [/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.zh-CN.js] Not Found
+[2018-04-25T09:46:58.043] [ERROR] app.js - [/javascripts/lib.js] Not Found
+[2018-04-25T09:46:58.052] [ERROR] app.js - [/vendor/toastr/toastr.min.js] Not Found
+[2018-04-25T09:47:57.416] [INFO] routes/index.js/ - routes/index.js info
+[2018-04-25T09:47:57.420] [ERROR] routes/index.js/ - routes/index.js error
+[2018-04-25T09:48:01.677] [INFO] routes/index.js/ - routes/index.js info
+[2018-04-25T09:48:01.679] [ERROR] routes/index.js/ - routes/index.js error
+[2018-04-25T09:48:07.238] [ERROR] app.js - [/9_1524620887220_7225664422545688.jpg] Not Found
+[2018-04-25T09:50:06.891] [INFO] routes/index.js/ - routes/index.js info
+[2018-04-25T09:50:06.893] [ERROR] routes/index.js/ - routes/index.js error
+[2018-04-25T09:59:08.149] [INFO] routes/index.js/ - routes/index.js info
+[2018-04-25T09:59:08.153] [ERROR] routes/index.js/ - routes/index.js error
+[2018-04-25T09:59:59.122] [INFO] routes/index.js/ - routes/index.js info
+[2018-04-25T09:59:59.123] [ERROR] routes/index.js/ - routes/index.js error
+[2018-04-25T10:05:23.056] [ERROR] app.js - [/undefined_sprites_1524621923044_7914090355415315.png] Not Found
+[2018-04-25T14:57:52.003] [ERROR] app.js - [/favicon.ico] Not Found

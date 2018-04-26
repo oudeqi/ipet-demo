@@ -6,22 +6,18 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const bodyParser = require('body-parser');
-const { COOKIE_SECRET, COOKIE_NAME, COOKIE_MAXAGE } = require('./config/index');
+const { COOKIE_SECRET, COOKIE_NAME, COOKIE_MAXAGE, STATIC_PATH } = require('./app/config/index');
 
 // 引入 mongoose 配置文件
-const mongoose_config = require('./config/mongoose.js');
+const mongoose_config = require('./app/config/mongoose.js');
 // 执行配置文件中的函数，以实现数据库的配置和 Model 的创建等
 const mongoose = mongoose_config();
 
-const index = require('./routes/index');
-const pet = require('./routes/pet');
-const users = require('./routes/users');
-const other = require('./routes/other');
-const test = require('./routes/test');
+const router = require('./app/config/router');
 const app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'app', 'views'));
 // app.set('view engine', 'ejs');
 //--------------------------------------------
 //注册模板引擎的后缀名
@@ -43,11 +39,11 @@ app.use(session({
     saveUninitialized: true
 }));
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(STATIC_PATH, express.static(path.join(__dirname, 'public')));
 // 上传图片的文件
-app.use(express.static(path.join(__dirname, 'uploads')));
+app.use(STATIC_PATH, express.static(path.join(__dirname, 'uploads')));
 // 上传的头像
-app.use(express.static(path.join(__dirname, 'avatar')));
+app.use(STATIC_PATH, express.static(path.join(__dirname, 'app', 'avatar')));
 
 // 允许跨域访问
 // app.all('*', function(req, res, next) {
@@ -59,11 +55,7 @@ app.use(express.static(path.join(__dirname, 'avatar')));
 //     next();  
 // });
 
-app.use('/', index);
-app.use('/', other);
-app.use('/pet', pet);
-app.use('/users', users);
-app.use('/test', test);
+app.use('/', router);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -72,7 +64,7 @@ app.use(function(req, res, next) {
   next(err);
 });
 
-const log4js= require('./config/log4js.js')
+const log4js= require('./app/config/log4js')
 const log = log4js.getLogger('app.js')
 // error handler
 app.use(function(err, req, res, next) {

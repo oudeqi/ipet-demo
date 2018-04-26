@@ -3,10 +3,10 @@
 	<head>
 		<title>首页</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-		<link rel='stylesheet' href='/stylesheets/style.css' />
+		<link rel='stylesheet' href='/static/stylesheets/style.css' />
 		<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-		<link href="/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.css" rel="stylesheet" media="screen">
-		<link href="/vendor/toastr/toastr.css" rel="stylesheet" media="screen">
+		<link href="/static/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.css" rel="stylesheet" media="screen">
+		<link href="/static/vendor/toastr/toastr.css" rel="stylesheet" media="screen">
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 		<link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
 		<!-- airbnb -->
@@ -74,12 +74,12 @@
 	</body>
 	<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 	<script src="https://cdn.bootcss.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-	<script type="text/javascript" src="/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.js"></script>
-	<script type="text/javascript" src="/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
-	<script type="text/javascript" src="/javascripts/lib.js"></script>
+	<script type="text/javascript" src="/static/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.js"></script>
+	<script type="text/javascript" src="/static/vendor/bootstrap-datetimepicker/bootstrap-datetimepicker.zh-CN.js"></script>
+	<script type="text/javascript" src="/static/javascripts/lib.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 	<script src="https://npmcdn.com/flatpickr/dist/l10n/zh.js"></script>
-	<script type="text/javascript" src="/vendor/toastr/toastr.min.js"></script>
+	<script type="text/javascript" src="/static/vendor/toastr/toastr.min.js"></script>
 	<script type="text/javascript">
 
 		// datetimepicker
@@ -145,8 +145,8 @@
 				console.log(res)
 				let pic = document.querySelector('#avatar_view')
 				if (pic && res.ok) {
-					pic.setAttribute('src', res.data.filename)
-					pic.setAttribute('data-src', res.data.filename)
+					pic.setAttribute('src', res.data.baseUrl + res.data.filename)
+					pic.setAttribute('data-src', res.data.baseUrl + res.data.filename)
 				}
 			})
 			.catch(error => console.log(error))

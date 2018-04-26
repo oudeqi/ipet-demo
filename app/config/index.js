@@ -3,6 +3,7 @@ module.exports = {
 	COOKIE_SECRET: 'secret_123456',
 	COOKIE_NAME: 'connect.sid',
 	COOKIE_MAXAGE: 1000 * 60 * 30,
+	STATIC_PATH: '/static',
 	PET_CATEGORY: [
 		{
 			label: '喵喵',

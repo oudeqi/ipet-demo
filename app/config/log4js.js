@@ -3,6 +3,8 @@ const log4js = require('log4js')
 let appenders = process.env.NODE_ENV === 'production' ? ['dateFile'] : ['stdout', 'dateFile'];
 let level = process.env.NODE_ENV === 'production' ? 'error' : 'info';
 
+console.log('process.env.NODE_ENV:', process.env.NODE_ENV)
+
 log4js.configure({
     replaceConsole: true,
     appenders: {

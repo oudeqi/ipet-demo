@@ -1,19 +1,25 @@
-const express = require('express');
-const router = express.Router();
-const multer  = require('multer');
 const path  = require('path');
-const fs  = require('fs');
 const Pet = require('../models/pet.js');
 const { PET_CATEGORY } = require('../config')
 const { createFolder, copySingleFile, fileExists } = require('../config/utils')
 
-router.post('/add', multer({ dest: 'uploads/' }).none(), function (req, res, next) {
+/* 获取类别 */ 
+exports.getCategory = function (req, res, next) {
+	res.json({
+		ok: true,
+		msg: 'success',
+		data: PET_CATEGORY
+	})
+}
+
+/* 添加 */ 
+exports.add = function (req, res, next) {
 	let { avatar, name, category, varieties, birthday } = req.body
 	let msg = 'success'
 	if (!avatar) {
 		msg = '请上传头像'
 	}
-	let avatarPath = path.resolve(__dirname, '..', 'uploads', avatar)
+	let avatarPath = path.resolve(__dirname, '..', '..', 'uploads', path.basename(avatar))
 	if (!fileExists(avatarPath)) {
 		msg = '头像不存在，请重新上传'
 	}
@@ -52,7 +58,7 @@ router.post('/add', multer({ dest: 'uploads/' }).none(), function (req, res, nex
 			next(err)
 		} else {
 			createFolder(path.resolve(__dirname, '..', 'avatar'))
-			copySingleFile(avatarPath, path.resolve(__dirname, '..', 'avatar', avatar))
+			copySingleFile(avatarPath, path.resolve(__dirname, '..', 'avatar', path.basename(avatar)))
 			res.json({
 				ok: true,
 				msg: 'success',
@@ -65,14 +71,4 @@ router.post('/add', multer({ dest: 'uploads/' }).none(), function (req, res, nex
 			})
 		}
 	})
-});
-
-router.get('/category', function (req, res, next) {
-	res.json({
-		ok: true,
-		msg: 'success',
-		data: PET_CATEGORY
-	})
-})
-
-module.exports = router;
+}
